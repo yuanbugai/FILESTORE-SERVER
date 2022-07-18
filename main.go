@@ -16,7 +16,7 @@ func main() {
 	http.HandleFunc("/file/meta", handler.GetFileMetahandle)
 	http.HandleFunc("/usr/sign/up", handler.Signuphandler)
 	http.HandleFunc("/user/signin", handler.Signinhandler)
-	http.HandleFunc("/user/info", handler.UserinfoHandler)
+	http.HandleFunc("/user/info", handler.HTTPInterceptor(handler.UserinfoHandler))
 	err := http.ListenAndServe(":80", nil)
 	if err != nil {
 		fmt.Println("Failed to start server: ", err.Error())

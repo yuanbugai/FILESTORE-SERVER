@@ -85,13 +85,13 @@ func UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	//1.解析请求参数
 	r.ParseForm()
 	username := r.Form.Get("username")
-	token := r.Form.Get("token")
-	//2.验证token是否有效
-	valid := isTokenValid(token, username)
-	if !valid {
-		fmt.Println("token invalid")
-
-	}
+	//token := r.Form.Get("token")
+	////2.验证token是否有效
+	//valid := IsTokenValid(token)
+	//if !valid {
+	//	fmt.Println("token invalid")
+	//
+	//}
 
 	//3.查询用户信息
 	user, err := dblayer.GetuserinfoByuer_name(username)
@@ -119,17 +119,12 @@ func GenToken(username string) string {
 	tokenprefix := util.MD5([]byte(username + ts + "_tokensalt"))
 	return tokenprefix + ts[:8]
 }
-func isTokenValid(token, username string) bool {
-	tokenbyusername := dblayer.GenTokenbyusername(username)
-	//TODO: 判断token的时效性，是否过期
-	//if len(token) != 40 {
-	//	return false
-	//}
-	//TODO: 从数据库表tbl_user_token查询username对应的token信息
-
-	//TODO: 对比两个token是否一致
-	if token == tokenbyusername.Token {
-		return true
+func IsTokenValid(token string) bool {
+	if len(token) != 40 {
+		return false
 	}
-	return false
+	// TODO: 判断token的时效性，是否过期
+	// TODO: 从数据库表tbl_user_token查询username对应的token信息
+	// TODO: 对比两个token是否一致
+	return true
 }
