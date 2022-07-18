@@ -4,7 +4,6 @@ import (
 	dblayer "awesomeProject4/db"
 	"awesomeProject4/util"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -16,15 +15,16 @@ const (
 //Signuphandler:处理用户注册
 func Signuphandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		data, err := ioutil.ReadFile("./static/view/test.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Println("404")
-			return
-		}
-		w.Write(data)
+		// data, err := ioutil.ReadFile("./static/view/signup.html")
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+		// w.Write(data)
+		http.Redirect(w, r, "/static/view/signup.html", http.StatusFound)
 		return
 	}
+
 	r.ParseForm()
 	username := r.Form.Get("username")
 	passwd := r.Form.Get("password")
@@ -45,6 +45,16 @@ func Signuphandler(w http.ResponseWriter, r *http.Request) {
 
 //Signinhandler :登录接口
 func Signinhandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		// data, err := ioutil.ReadFile("./static/view/signin.html")
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+		// w.Write(data)
+		http.Redirect(w, r, "/static/view/signin.html", http.StatusFound)
+		return
+	}
 	//校验用户名及密码
 	r.ParseForm()
 	username := r.Form.Get("username")
@@ -54,6 +64,8 @@ func Signinhandler(w http.ResponseWriter, r *http.Request) {
 	if !pwdchecked {
 		w.Write([]byte("failed"))
 		return
+	} else {
+		fmt.Println("login successful")
 	}
 	//生成Token访问
 	token := GenToken(username)
