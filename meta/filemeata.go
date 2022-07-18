@@ -30,3 +30,17 @@ func UpdateFileMetadb(fmeta FileMeta) bool {
 func GetFileMeta(FileSha1 string) FileMeta {
 	return fileMetas[FileSha1]
 }
+func GetFileMetadb(filesha1 string) (FileMeta, error) {
+	meta, err := mysql.GetFileMeta(filesha1)
+	if err != nil {
+		return FileMeta{}, err
+	}
+	fmeta := FileMeta{
+		FileSha1: meta.Filehash,
+		FileName: meta.Filename,
+		FileSize: meta.Filesize,
+		Location: meta.Fileaddr,
+	}
+	return fmeta, nil
+
+}

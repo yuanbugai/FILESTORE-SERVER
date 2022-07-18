@@ -29,3 +29,27 @@ func OnFileUploadFinished(filehash string, filename string,
 	}
 	return false
 }
+
+type Tablefile struct {
+	Filehash string `json:"filehash"`
+	Filename string `json:"filename"`
+	Filesize int64  `json:"filesize"`
+	Fileaddr string `json:"fileaddr"`
+}
+
+// GetFileMeta:从mysql获取文件源信息
+func GetFileMeta(filehash string) (*Tablefile, error) {
+
+	stmt, err := mydb.Dbconnect().Prepare("select file_sha1,file_addr,file_name,file_size from tab_file " +
+		"where file_sha1=? and status=1 limit 1")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	tfile := Tablefile{}
+	stmt.QueryRow(filehash).Scan(&tfile.Filehash, &tfile.Fileaddr, &tfile.Filename, &tfile.Filesize)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return &tfile, nil
+}

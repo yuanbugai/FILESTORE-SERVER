@@ -71,12 +71,20 @@ func Uploadsuchandle(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "upload successful")
 }
 
+//GetFileMetahandle :通过hash获取文件信息
 func GetFileMetahandle(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filehash := r.Form["filehash"][0]
 	fmeta := meta.GetFileMeta(filehash)
+	fmeta, err2 := meta.GetFileMetadb(filehash)
+	if err2 != nil {
+		fmt.Println("get file metadata DB error")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	data, err := json.Marshal(fmeta)
 	if err != nil {
+		fmt.Println("get file metadata DB  Write error")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
