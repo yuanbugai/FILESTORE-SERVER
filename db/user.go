@@ -18,11 +18,13 @@ func Usersingup(username string, password string) bool {
 		fmt.Println("Failed to insert,err:" + err.Error())
 
 	}
+	//todo check
 	affected, err := ret.RowsAffected()
 	if err != nil && affected > 0 {
 		return true
 	}
 	return false
+	//
 }
 
 //Usersignin : 通过用户名判断是否有这个用户

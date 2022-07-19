@@ -15,7 +15,7 @@ type UserFile struct {
 	LastUpdated string
 }
 
-// OnUserFileUploadFinished : 更新用户文件表
+// OnUserFileUploadFinished : 更新用户文件表：上传文件元信息添加到用户表
 func OnUserFileUploadFinished(username, filehash, filename string, filesize int64) bool {
 	stmt, err := mydb.Dbconnect().Prepare(
 		"insert ignore into tbl_user_file (`user_name`,`file_sha1`,`file_name`," +
@@ -35,7 +35,7 @@ func OnUserFileUploadFinished(username, filehash, filename string, filesize int6
 // QueryUserFileMetas : 批量获取用户文件信息
 func QueryUserFileMetas(username string, limit int) ([]UserFile, error) {
 	stmt, err := mydb.Dbconnect().Prepare(
-		"select file_sha1,file_name,file_size,upload_at," +
+		"select user_name,file_sha1,file_name,file_size,upload_at," +
 			"last_update from tbl_user_file where user_name=? limit ?")
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func QueryUserFileMetas(username string, limit int) ([]UserFile, error) {
 	var userFiles []UserFile
 	for rows.Next() {
 		ufile := UserFile{}
-		err = rows.Scan(&ufile.FileHash, &ufile.FileName, &ufile.FileSize,
+		err = rows.Scan(&ufile.UserName, &ufile.FileHash, &ufile.FileName, &ufile.FileSize,
 			&ufile.UploadAt, &ufile.LastUpdated)
 		if err != nil {
 			fmt.Println(err.Error())

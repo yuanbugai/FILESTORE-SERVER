@@ -2,6 +2,7 @@ package meta
 
 import (
 	mysql "awesomeProject4/db"
+	"reflect"
 )
 
 type FileMeta struct {
@@ -25,6 +26,9 @@ func UpdateFileMeta(fmeta FileMeta) {
 func UpdateFileMetadb(fmeta FileMeta) bool {
 	return mysql.OnFileUploadFinished(fmeta.FileSha1, fmeta.FileName, fmeta.FileSize, fmeta.Location)
 }
+func (a FileMeta) IsEmpty() bool {
+	return reflect.DeepEqual(a, FileMeta{})
+}
 
 // GetFileMeta GetFileMeta:通过sha1值获取文件的元信息对象
 func GetFileMeta(FileSha1 string) FileMeta {
@@ -43,4 +47,9 @@ func GetFileMetadb(filesha1 string) (FileMeta, error) {
 	}
 	return fmeta, nil
 
+}
+
+// RemoveFileMeta : 删除元信息
+func RemoveFileMeta(fileSha1 string) {
+	delete(fileMetas, fileSha1)
 }
