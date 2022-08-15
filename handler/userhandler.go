@@ -4,6 +4,7 @@ import (
 	dblayer "awesomeProject4/db"
 	"awesomeProject4/util"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 )
@@ -13,34 +14,40 @@ const (
 )
 
 //Signuphandler:处理用户注册
-func Signuphandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		// data, err := ioutil.ReadFile("./static/view/signup.html")
-		// if err != nil {
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-		// w.Write(data)
-		http.Redirect(w, r, "/static/view/signup.html", http.StatusFound)
-		return
-	}
+func Signuphandler(c *gin.Context) {
 
-	r.ParseForm()
-	username := r.Form.Get("username")
-	passwd := r.Form.Get("password")
+	c.Redirect(http.StatusOK, "/static/view/signup.html")
+}
+
+//Dosignuphandler:处理post请求
+func Dosignuphandler(c *gin.Context) {
+
+	username := c.Request.FormValue("username")
+	passwd := c.Request.FormValue("password")
 	if len(username) < 3 || len(passwd) < 5 {
-		w.Write([]byte("invalid paramter"))
+
+		c.JSON(http.StatusOK, gin.H{
+			"msg":  "invalid paramter",
+			"code": -1,
+		})
 		fmt.Println("invalid paramter")
 		return
 	}
-	enc_passwd := util.Sha1([]byte(passwd + pwd_salted))
-	suc := dblayer.Usersingup(username, enc_passwd)
-	if suc {
-		w.Write([]byte("success"))
+	encPassword := util.Sha1([]byte(passwd + pwd_salted))
+	pwdchecked := dblayer.Usersignin(username, encPassword)
+	if !pwdchecked {
+		c.JSON(http.StatusOK, gin.H{
+			"msg":  "invalid signin",
+			"code": -2,
+		})
+		return
 	} else {
-		w.Write([]byte("Filed"))
+		fmt.Println("login successful")
+		c.JSON(http.StatusOK, gin.H{
+			"msg":  "success login",
+			"code": 0,
+		})
 	}
-
 }
 
 //Signinhandler :登录接口
@@ -90,6 +97,19 @@ func Signinhandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	w.Write(resp.JSONBytes())
+}
+func Dosigninhandler(c *gin.Context) {
+	username := c.Request.FormValue("username")
+	password := c.Request.FormValue("password")
+	encPassword := util.Sha1([]byte(password + pwd_salted))
+	pwdchecked := dblayer.Usersignin(username, encPassword)
+	if !pwdchecked {
+		c.JSON(http.StatusOK, gin.H{
+			"Msg":  "signup failed",
+			"code": -1,
+		})
+		return
+	}
 }
 
 //UserinfoHandler :查询用户信息
